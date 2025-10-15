@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Farmer's Math Feast</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: #f7f3ea;
+    }
+
+    .game-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255, 251, 231, 0.98);
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      display: none;
+    }
+
+    #backgroundContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #backgroundImage {
+      max-width: 100%;
+      max-height: 100vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      margin: auto;
+    }
+
+    .level-title {
+      font-size: 28px;
+      color: #2c1810;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .story {
+      font-size: 18px;
+      color: #4a3828;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .question {
+      font-size: 24px;
+      color: #2c1810;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .input-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .input-group input {
+      padding: 10px;
+      font-size: 18px;
+      border: 2px solid #4a3828;
+      border-radius: 5px;
+      width: 150px;
+    }
+
+    .input-group button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background: #7abd5a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .feedback, .results {
+      text-align: center;
+      font-size: 20px;
+      margin: 15px 0;
+    }
+
+    #startScreen {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    #guideScreen {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .start-image-wrap {
+      position: relative;
+      max-width: 100%;
+      max-height: 100vh;
+    }
+
+    .button-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .button-container button {
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+
+    .button-container button:hover {
+      background: #fff;
+    }
+
+    .guide-content {
+      position: relative;
+      width: 90%;
+      height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .guide-content img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 5px;
+      padding: 5px 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="startScreen" style="position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 1000;">
+    <div class="start-image-wrap" style="position: relative; max-width: 90%; max-height: 90vh; display: flex; flex-direction: column; align-items: center;">
+  <img src="Assets/opening-and-tutorial.jpg" alt="Opening & Tutorial" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      <div class="button-container" style="position: absolute; bottom: 20px; display: flex; gap: 10px;">
+        <button id="startButton">Start</button>
+        <button id="guideButton">Game Guide</button>
+        <button id="miniGameButton">Mini-Game</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tutorialScreen" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); z-index: 1500; display: none; align-items: center; justify-content: center;">
+    <div class="tutorial-content" style="position: relative; width: 90%; height: 90vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <div id="tutorialImage" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+  <img src="Assets/opening-and-tutorial.jpg" alt="Tutorial" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="bgTheme1Image" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/bg-theme-1.jpg" alt="BG Theme 1" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="bgTheme2Image" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/bg-theme-2.jpg" alt="BG Theme 2" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="bgTheme3Image" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/bg-theme-3.jpg" alt="BG Theme 3" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <button id="tutorialButton" style="margin-top: 20px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer; font-size: 18px;">Continue</button>
+    </div>
+  </div>
+
+  <div id="guideScreen">
+    <div class="guide-content">
+  <img src="Assets/game-guide.jpg" alt="Game Guide">
+      <button class="close-button" id="closeGuide">Close</button>
+    </div>
+  </div>
+
+  <div id="miniGameScreen" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); display: none; align-items: center; justify-content: center; z-index: 2000;">
+    <div class="guide-content" style="position: relative; max-width: 90%; max-height: 90vh; display: flex; flex-direction: column; align-items: center;">
+      <div id="miniGameOption" style="width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center;">
+  <img src="Assets/minigameoption1.jpg" alt="Mini-Game Option 1" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+        <button id="goButton" style="margin-top: 20px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; padding: 10px 40px; cursor: pointer; font-size: 24px;">Go!</button>
+      </div>
+      <div id="constellationImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/mini-game-1-constellation.jpg" alt="Constellation" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="orionImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+        <img src="Assets/Orion.jpg" alt="Orion" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="leoImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+        <img src="Assets/Leo.jpg" alt="Leo" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="dipperImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/big-dipper.jpg" alt="Big Dipper" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="guessItImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/guess-it.jpg" alt="Guess It" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="guessLeoImage" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center;">
+  <img src="Assets/guess-leo.jpg" alt="Guess Leo" style="max-width: 100%; max-height: 80vh; width: auto; height: auto; object-fit: contain;">
+        <div id="guessFeedback" style="margin-top: 15px; font-size: 24px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        <div id="guessButtons" style="margin-top: 20px; display: flex; gap: 20px;">
+          <button class="guess-button" id="guessLeoBtn" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's a Leo!</button>
+          <button class="guess-button" id="guessDipperBtn" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's a Big Dipper!</button>
+          <button class="guess-button" id="guessOrionBtn" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's an Orion!</button>
+        </div>
+      </div>
+      <div id="guessOrionImage" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center;">
+  <img src="Assets/guess-orion.jpg" alt="Guess Orion" style="max-width: 100%; max-height: 80vh; width: auto; height: auto; object-fit: contain;">
+        <div id="guessOrionFeedback" style="margin-top: 15px; font-size: 24px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        <div id="guessOrionButtons" style="margin-top: 20px; display: flex; gap: 20px;">
+          <button class="guess-button" id="guessLeoBtn2" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's a Leo!</button>
+          <button class="guess-button" id="guessDipperBtn2" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's a Big Dipper!</button>
+          <button class="guess-button" id="guessOrionBtn2" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's an Orion!</button>
+        </div>
+      </div>
+      <div id="guessDipperImage" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center;">
+  <img src="Assets/guess-dipper.jpg" alt="Guess Big Dipper" style="max-width: 100%; max-height: 80vh; width: auto; height: auto; object-fit: contain;">
+        <div id="guessDipperFeedback" style="margin-top: 15px; font-size: 24px; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        <div id="guessDipperButtons" style="margin-top: 20px; display: flex; gap: 20px;">
+          <button class="guess-button" id="guessLeoBtn3" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's a Leo!</button>
+          <button class="guess-button" id="guessDipperBtn3" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's a Big Dipper!</button>
+          <button class="guess-button" id="guessOrionBtn3" style="padding: 10px 20px; font-size: 18px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; cursor: pointer;">It's an Orion!</button>
+        </div>
+      </div>
+      <div id="constellationsFinImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/constellationsfin.jpg" alt="Constellations Final" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <button class="close-button" id="closeMiniGame">Close</button>
+    </div>
+  </div>
+
+  <div id="endingScreen" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); z-index: 3000; display: none; align-items: center; justify-content: center;">
+    <div class="ending-content" style="position: relative; max-width: 90%; max-height: 90vh;">
+  <img src="Assets/ending-page-feast.jpg" alt="Feast Ending" style="max-width: 100%; height: auto;">
+    </div>
+  </div>
+
+  <div id="encouragementScreen" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); z-index: 2500; display: none; align-items: center; justify-content: center; flex-direction: column;">
+    <div style="position: relative; max-width: 90%; max-height: 90vh; display: flex; flex-direction: column; align-items: center;">
+      <div id="birdsAndBunniesImage" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+  <img src="Assets/birds-and-bunnies.jpg" alt="Keep trying!" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="scarecrowImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/building-the-scarecrow-intro-page.jpg" alt="Building the Scarecrow Intro" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="scarecrowStartImage" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+  <img src="Assets/building-the-scarecrow-start.jpg" alt="Building the Scarecrow Start" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 15px;">
+          <div style="color: white; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Let's practice: 3 + 2 = ?</div>
+          <input type="text" id="scarecrowAnswerStart" placeholder="Enter your answer" style="padding: 10px; font-size: 18px; border: 2px solid #4a3828; border-radius: 5px; width: 150px; margin-right: 10px; background: rgba(255, 255, 255, 0.9);">
+          <button id="scarecrowSubmitStart" style="padding: 10px 20px; font-size: 18px; background: #7abd5a; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+          <div id="scarecrowFeedbackStart" style="color: white; font-size: 24px; margin-top: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        </div>
+      </div>
+      <div id="scarecrowQ1Image" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+  <img src="Assets/building-the-scarecrow-q1.jpg" alt="Building the Scarecrow Q1" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 15px;">
+          <div style="color: white; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Let's practice: 2 + 5 = ?</div>
+          <input type="text" id="scarecrowAnswer1" placeholder="Enter your answer" style="padding: 10px; font-size: 18px; border: 2px solid #4a3828; border-radius: 5px; width: 150px; margin-right: 10px; background: rgba(255, 255, 255, 0.9);">
+          <button id="scarecrowSubmit1" style="padding: 10px 20px; font-size: 18px; background: #7abd5a; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+          <div id="scarecrowFeedback1" style="color: white; font-size: 24px; margin-top: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        </div>
+      </div>
+      <div id="scarecrowQ2Image" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+  <img src="Assets/building-the-scarecrow-q2.jpg" alt="Building the Scarecrow Question 2" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 15px;">
+          <div style="color: white; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Great! Now try: 6 + 2 = ?</div>
+          <input type="text" id="scarecrowAnswer2" placeholder="Enter your answer" style="padding: 10px; font-size: 18px; border: 2px solid #4a3828; border-radius: 5px; width: 150px; margin-right: 10px; background: rgba(255, 255, 255, 0.9);">
+          <button id="scarecrowSubmit2" style="padding: 10px 20px; font-size: 18px; background: #7abd5a; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+          <div id="scarecrowFeedback2" style="color: white; font-size: 24px; margin-top: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        </div>
+      </div>
+      <div id="scarecrowQ3Image" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+  <img src="Assets/building-the-scarecrow-q3.jpg" alt="Building the Scarecrow Question 3" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 15px;">
+          <div style="color: white; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">You're doing great! Try: 4 + 3 = ?</div>
+          <input type="text" id="scarecrowAnswer3" placeholder="Enter your answer" style="padding: 10px; font-size: 18px; border: 2px solid #4a3828; border-radius: 5px; width: 150px; margin-right: 10px; background: rgba(255, 255, 255, 0.9);">
+          <button id="scarecrowSubmit3" style="padding: 10px 20px; font-size: 18px; background: #7abd5a; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+          <div id="scarecrowFeedback3" style="color: white; font-size: 24px; margin-top: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        </div>
+      </div>
+      <div id="scarecrowQ4Image" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+  <img src="Assets/building-the-scarecrow-q4.jpg" alt="Building the Scarecrow Question 4" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background: rgba(0, 0, 0, 0.7); padding: 20px; border-radius: 15px;">
+          <div style="color: white; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">You're doing great! Try: 3 + 6 = ?</div>
+          <input type="text" id="scarecrowAnswer4" placeholder="Enter your answer" style="padding: 10px; font-size: 18px; border: 2px solid #4a3828; border-radius: 5px; width: 150px; margin-right: 10px; background: rgba(255, 255, 255, 0.9);">
+          <button id="scarecrowSubmit4" style="padding: 10px 20px; font-size: 18px; background: #7abd5a; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+          <div id="scarecrowFeedback4" style="color: white; font-size: 24px; margin-top: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);"></div>
+        </div>
+      </div>
+      <div id="scarecrowQ5Image" style="width: 100%; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center;">
+  <img src="Assets/building-the-scarecrow-q5.jpg" alt="Building the Scarecrow Q5" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="scarecrowFinalImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/building-the-scarecrow-q5.jpg" alt="Final Scarecrow" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <div id="scarecrowCompleteImage" style="width: 100%; height: 100%; display: none; align-items: center; justify-content: center;">
+  <img src="Assets/scarecrow-complete.jpg" alt="Scarecrow Complete" style="max-width: 100%; max-height: 90vh; width: auto; height: auto; object-fit: contain;">
+      </div>
+      <button id="encouragementButton" style="margin-top: 20px; background: rgba(255, 255, 255, 0.9); border: none; border-radius: 5px; padding: 10px 20px; cursor: pointer; font-size: 18px;">Continue</button>
+    </div>
+  </div>
+
+  <div id="backgroundContainer">
+  <img id="backgroundImage" src="Assets/bg-theme-1.jpg" alt="Background">
+  </div>
+
+  <audio id="failSound" src="Assets/level-fail.mp3" preload="auto"></audio>
+  <audio id="passSound" src="Assets/level-pass.wav" preload="auto"></audio>
+  <audio id="correctSound" src="Assets/answer-correct.mp3" preload="auto"></audio>
+  <audio id="feastBgm" src="Assets/feast-bgm.mp3" preload="auto" loop></audio>
+
+  <div id="gameContainer" class="game-container">
+    <div id="levelTitle" class="level-title"></div>
+    <div id="story" class="story"></div>
+    <div id="question" class="question"></div>
+    <div class="input-group">
+      <input type="text" id="answer" placeholder="Enter your answer">
+      <button id="submitBtn">Submit</button>
+      <button id="nextBtn" style="display: none;">Next Level</button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+    <div id="results" class="results"></div>
+  </div>
+
+  <script>
+    // Wait for DOM to load
+    // Initialize event listeners after DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM Content Loaded');
+      // Game state
+      const gameState = {
+        currentLevel: 0,
+        questionNum: 0,
+        score: [0, 0, 0],
+        correctAnswers: [0, 0, 0], // Track correct answers for each level
+        questionsAsked: [0, 0, 0], // Track questions asked per level
+        requiredCorrect: 3, // Number of correct answers needed to complete a level
+        currentQuestion: null,
+        consecutiveWrong: [0, 0, 0], // Track wrong answers for each level
+        lastActiveLevel: 0, // Remember which level to return to after scarecrow
+        scarecrowQ1Answered: false,
+        scarecrowQ2Answered: false,
+        scarecrowQ3Answered: false,
+        scarecrowQ4Answered: false,
+        scarecrowQ5Answered: false
+      };
+
+      // Level definitions
+      const LEVELS = [
+        { 
+          name: 'Level 1: Gathering Apples 🍎',
+          op: '+',
+          min: 1,
+          max: 10,
+          questionCount: 5,      // Total questions in the level
+          requiredCorrect: 3,    // Need 3 correct to pass
+          intro: "Solve addition riddles to collect apples."
+        },
+        { 
+          name: 'Level 2: Collecting Eggs 🥚',
+          op: 'x',
+          min: 2,
+          max: 5,
+          questionCount: 5,
+          requiredCorrect: 3,
+          intro: "Solve multiplication riddles to collect eggs."
+        },
+        {
+          name: 'Level 3: Harvesting Carrots 🥕',
+          op: 'mixed',
+          min: 2,
+          max: 5,
+          questionCount: 5,
+          requiredCorrect: 3,
+          intro: "Solve multiplication and division riddles to grow carrots."
+        }
+      ];
+
+      // Get DOM elements
+      const elements = {
+        // Main screens
+        startScreen: document.getElementById('startScreen'),
+        tutorialScreen: document.getElementById('tutorialScreen'),
+        gameContainer: document.getElementById('gameContainer'),
+        guideScreen: document.getElementById('guideScreen'),
+        miniGameScreen: document.getElementById('miniGameScreen'),
+        endingScreen: document.getElementById('endingScreen'),
+        encouragementScreen: document.getElementById('encouragementScreen'),
+        
+        // Start screen elements
+        startButton: document.getElementById('startButton'),
+        guideButton: document.getElementById('guideButton'),
+        miniGameButton: document.getElementById('miniGameButton'),
+        
+        // Tutorial elements
+        tutorialButton: document.getElementById('tutorialButton'),
+        
+        // Game elements
+        backgroundImage: document.getElementById('backgroundImage'),
+        levelTitle: document.getElementById('levelTitle'),
+        story: document.getElementById('story'),
+        question: document.getElementById('question'),
+        answer: document.getElementById('answer'),
+        submitBtn: document.getElementById('submitBtn'),
+        nextBtn: document.getElementById('nextBtn'),
+        feedback: document.getElementById('feedback'),
+        results: document.getElementById('results'),
+        
+        // Audio elements
+        failSound: document.getElementById('failSound'),
+        passSound: document.getElementById('passSound'),
+        correctSound: document.getElementById('correctSound'),
+        feastBgm: document.getElementById('feastBgm'),
+        
+        // Screen controls
+        closeGuide: document.getElementById('closeGuide'),
+        closeMiniGame: document.getElementById('closeMiniGame'),
+        encouragementButton: document.getElementById('encouragementButton')
+      };
+
+      // Set background image
+      function setBackground(level) {
+        console.log('Setting background for level:', level);
+        if (level === 0) { // Level 1
+          elements.backgroundImage.src = 'Assets/summer-bg.jpg';
+        } else if (level === 1) { // Level 2
+          elements.backgroundImage.src = 'Assets/green-bg.jpg';
+        } else { // Level 3
+          elements.backgroundImage.src = 'Assets/autumn-bg.jpg';
+        }
+      }
+
+      // Generate question
+      function generateQuestion() {
+        const level = LEVELS[gameState.currentLevel];
+        let num1, num2, correctAnswer, operation;
+        
+        if (level.op === '+') {
+          num1 = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+          num2 = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+          correctAnswer = num1 + num2;
+          operation = '+';
+        } else if (level.op === 'x') {
+          num1 = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+          num2 = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+          correctAnswer = num1 * num2;
+          operation = 'x';
+        } else if (level.op === 'mixed') {
+          // Randomly choose between multiplication and division
+          const isMult = Math.random() < 0.5;
+          if (isMult) {
+            num1 = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+            num2 = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+            correctAnswer = num1 * num2;
+            operation = 'x';
+          } else {
+            // For division, first generate the answer and one number, then calculate the other number
+            correctAnswer = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+            num2 = Math.floor(Math.random() * (level.max - level.min + 1)) + level.min;
+            num1 = correctAnswer * num2; // This ensures we get whole numbers
+            operation = '÷';
+          }
+        }
+        
+        return { num1, num2, correctAnswer, operation };
+      }
+
+      // Ask question
+      // Generate a word problem based on the level and numbers
+      function generateWordProblem(level, num1, num2, operation) {
+        const problems = {
+          0: [ // Level 1 - Addition problems about apples
+            `Farmer Fred found ${num1} red apples and ${num2} green apples. How many apples did he find in total?`,
+            `${num1} apples fell from the tree, then ${num2} more fell down. How many apples fell in total?`,
+            `Farmer Fred picked ${num1} apples in the morning and ${num2} in the evening. How many apples did he pick today?`
+          ],
+          1: [ // Level 2 - Multiplication problems about eggs
+            `Each chicken laid ${num1} eggs, and there are ${num2} chickens. How many eggs are there in total?`,
+            `Farmer Fred found ${num2} nests with ${num1} eggs each. How many eggs did he find?`,
+            `${num2} chickens each lay ${num1} eggs per day. How many eggs do they lay in total?`
+          ],
+          2: [ // Level 3 - Mixed problems about carrots
+            operation === 'x' ? 
+              `There are ${num2} rows in the garden, with ${num1} carrots in each row. How many carrots are there in total?` :
+              `Farmer Fred has ${num1} carrots to split equally among ${num2} baskets. How many carrots go in each basket?`
+          ]
+        };
+        
+        // Get random problem for this level
+        const levelProblems = problems[level];
+        const randomIndex = Math.floor(Math.random() * levelProblems.length);
+        return levelProblems[randomIndex];
+      }
+
+      function askQuestion() {
+        // Generate new question
+        const question = generateQuestion();
+        const wordProblem = generateWordProblem(gameState.currentLevel, question.num1, question.num2, question.operation);
+        
+        // Update UI with new question
+        elements.question.textContent = wordProblem;
+        elements.answer.value = '';
+        elements.answer.disabled = false;
+        elements.submitBtn.disabled = false;
+        
+        // Store current question state
+        gameState.currentQuestion = question;
+        
+        // Show progress in UI
+        const currentLevel = LEVELS[gameState.currentLevel];
+        const progress = `Question ${gameState.questionsAsked[gameState.currentLevel] + 1} of ${currentLevel.questionCount} (Need ${currentLevel.requiredCorrect} correct to pass)`;
+        elements.results.textContent = progress;
+      }
+
+      // Start level
+      function startLevel() {
+        console.log('Starting level:', gameState.currentLevel);
+        
+        // Show game container
+        elements.gameContainer.style.display = 'block';
+        
+        // Set background
+        setBackground(gameState.currentLevel);
+        
+        // Reset counters for this level
+        gameState.consecutiveWrong[gameState.currentLevel] = 0;
+        gameState.correctAnswers[gameState.currentLevel] = 0;
+        
+        // Set level content
+        elements.levelTitle.textContent = LEVELS[gameState.currentLevel].name;
+        elements.story.textContent = LEVELS[gameState.currentLevel].intro;
+        
+        // Clear previous feedback
+        elements.feedback.textContent = '';
+        elements.results.textContent = '';
+        
+        // Generate first question
+        askQuestion();
+      }
+
+      // Start game
+      function startGame() {
+        console.log('Start button clicked');
+        console.log('Elements:', elements);
+        console.log('Starting game...');
+        gameState.currentLevel = 0;
+        gameState.questionNum = 0;
+        gameState.score = [0, 0, 0];
+        gameState.correctAnswers = [0, 0, 0];
+        gameState.questionsAsked = [0, 0, 0];
+        
+        elements.startScreen.style.display = 'none';
+        elements.tutorialScreen.style.display = 'flex';
+        document.getElementById('tutorialImage').style.display = 'flex';
+        document.getElementById('bgTheme1Image').style.display = 'none';
+        tutorialStep = 1;
+        console.log('Game started, showing tutorial');
+      }
+
+      let tutorialStep = 1;
+      let encouragementStep = 1;
+
+      // Start gameplay after tutorial
+      function startGameplay() {
+        console.log('Starting gameplay, tutorial step:', tutorialStep);
+        if (tutorialStep === 1) {
+          // Switch from tutorial image to BG Theme 1
+          document.getElementById('tutorialImage').style.display = 'none';
+          document.getElementById('bgTheme1Image').style.display = 'flex';
+          tutorialStep = 2;
+        } else {
+          // Start the actual game
+          elements.tutorialScreen.style.display = 'none';
+          elements.gameContainer.style.display = 'block';
+          gameState.questionNum = 0;
+          gameState.score = [0, 0, 0];
+          gameState.correctAnswers = [0, 0, 0];
+          gameState.questionsAsked = [0, 0, 0];
+          startLevel();
+          console.log('Game started, showing first level');
+        }
+      }
+
+      // Add event listeners
+      const startButton = document.getElementById('startButton');
+      const tutorialButton = document.getElementById('tutorialButton');
+      const guideButton = document.getElementById('guideButton');
+      const miniGameButton = document.getElementById('miniGameButton');
+
+      console.log('Setting up event listeners');
+      if (startButton) {
+        console.log('Adding start button listener');
+        startButton.addEventListener('click', startGame);
+      } else {
+        console.error('Start button not found!');
+      }
+
+      if (tutorialButton) {
+        console.log('Adding tutorial button listener');
+        tutorialButton.addEventListener('click', startGameplay);
+      } else {
+        console.error('Tutorial button not found!');
+      }
+      
+      elements.guideButton.addEventListener('click', () => {
+        elements.guideScreen.style.display = 'flex';
+      });
+      
+      elements.closeGuide.addEventListener('click', () => {
+        elements.guideScreen.style.display = 'none';
+      });
+
+      elements.miniGameButton.addEventListener('click', () => {
+        elements.miniGameScreen.style.display = 'flex';
+      });
+
+      elements.closeMiniGame.addEventListener('click', () => {
+        elements.miniGameScreen.style.display = 'none';
+        // Reset mini-game state
+        document.getElementById('miniGameOption').style.display = 'flex';
+        document.getElementById('constellationImage').style.display = 'none';
+        document.getElementById('orionImage').style.display = 'none';
+        document.getElementById('leoImage').style.display = 'none';
+        document.getElementById('dipperImage').style.display = 'none';
+        document.getElementById('guessItImage').style.display = 'none';
+        document.getElementById('guessLeoImage').style.display = 'none';
+        document.getElementById('guessOrionImage').style.display = 'none';
+        document.getElementById('guessDipperImage').style.display = 'none';
+        document.getElementById('constellationsFinImage').style.display = 'none';
+        document.getElementById('goButton').style.display = 'block';
+      });
+
+      document.getElementById('goButton').addEventListener('click', () => {
+        // Hide option screen and Go button
+        document.getElementById('miniGameOption').style.display = 'none';
+        document.getElementById('goButton').style.display = 'none';
+
+        // Show constellation image
+        document.getElementById('constellationImage').style.display = 'flex';
+
+        // After 3 seconds, switch to Orion image
+        setTimeout(() => {
+          document.getElementById('constellationImage').style.display = 'none';
+          document.getElementById('orionImage').style.display = 'flex';
+
+          // After 3 more seconds, switch to Leo image
+          setTimeout(() => {
+            document.getElementById('orionImage').style.display = 'none';
+            document.getElementById('leoImage').style.display = 'flex';
+
+            // After 3 more seconds, switch to Dipper image
+            setTimeout(() => {
+              document.getElementById('leoImage').style.display = 'none';
+              document.getElementById('dipperImage').style.display = 'flex';
+
+              // After 3 more seconds, switch to Guess It image
+              setTimeout(() => {
+                document.getElementById('dipperImage').style.display = 'none';
+                document.getElementById('guessItImage').style.display = 'flex';
+
+                // After 2 seconds, switch to Guess Leo image
+                setTimeout(() => {
+                  document.getElementById('guessItImage').style.display = 'none';
+                  document.getElementById('guessLeoImage').style.display = 'flex';
+                }, 2000);
+              }, 3000);
+            }, 3000);
+          }, 3000);
+        }, 3000);
+
+        // Add event listeners for guess buttons
+        document.getElementById('guessLeoBtn').addEventListener('click', () => {
+          document.getElementById('guessLeoImage').style.display = 'none';
+          document.getElementById('guessOrionImage').style.display = 'flex';
+        });
+
+        // Function to handle incorrect guesses
+        const handleIncorrectGuess = (feedbackId) => {
+          const feedbackEl = document.getElementById(feedbackId);
+          feedbackEl.textContent = "Let's guess again!";
+          feedbackEl.style.color = '#ffeb3b'; // Yellow color for visibility
+          
+          // Disable all buttons temporarily
+          const buttons = document.querySelectorAll('.guess-button');
+          buttons.forEach(btn => btn.disabled = true);
+          
+          // Reset after a short delay
+          setTimeout(() => {
+            feedbackEl.textContent = '';
+            buttons.forEach(btn => btn.disabled = false);
+          }, 1500);
+        };
+
+        document.getElementById('guessDipperBtn').addEventListener('click', () => handleIncorrectGuess('guessFeedback'));
+        document.getElementById('guessOrionBtn').addEventListener('click', () => handleIncorrectGuess('guessFeedback'));
+
+        // Event listeners for Orion guess buttons
+        document.getElementById('guessOrionBtn2').addEventListener('click', () => {
+          document.getElementById('guessOrionImage').style.display = 'none';
+          document.getElementById('guessDipperImage').style.display = 'flex';
+        });
+
+        document.getElementById('guessLeoBtn2').addEventListener('click', () => handleIncorrectGuess('guessOrionFeedback'));
+        document.getElementById('guessDipperBtn2').addEventListener('click', () => handleIncorrectGuess('guessOrionFeedback'));
+
+        // Event listeners for Big Dipper guess buttons
+        document.getElementById('guessDipperBtn3').addEventListener('click', () => {
+          document.getElementById('guessDipperImage').style.display = 'none';
+          document.getElementById('constellationsFinImage').style.display = 'flex';
+          
+          // After 3 seconds, return to the title page
+          setTimeout(() => {
+            elements.miniGameScreen.style.display = 'none';
+            document.getElementById('constellationsFinImage').style.display = 'none';
+            document.getElementById('miniGameOption').style.display = 'flex';
+            document.getElementById('goButton').style.display = 'block';
+            elements.startScreen.style.display = 'flex';
+          }, 3000);
+        });
+
+        document.getElementById('guessLeoBtn3').addEventListener('click', () => handleIncorrectGuess('guessDipperFeedback'));
+        document.getElementById('guessOrionBtn3').addEventListener('click', () => handleIncorrectGuess('guessDipperFeedback'));
+      });
+
+      elements.encouragementButton.addEventListener('click', () => {
+        if (encouragementStep === 1) {
+          // Switch from Birds and Bunnies to Scarecrow Intro
+          document.getElementById('birdsAndBunniesImage').style.display = 'none';
+          document.getElementById('scarecrowImage').style.display = 'flex';
+          document.getElementById('scarecrowQ1Image').style.display = 'none';
+          document.getElementById('scarecrowQ2Image').style.display = 'none';
+          document.getElementById('scarecrowQ3Image').style.display = 'none';
+          document.getElementById('scarecrowQ4Image').style.display = 'none';
+          encouragementStep = 2;
+        } else if (encouragementStep === 2) {
+          // Switch from Scarecrow Intro to Scarecrow Start
+          document.getElementById('birdsAndBunniesImage').style.display = 'none';
+          document.getElementById('scarecrowImage').style.display = 'none';
+          document.getElementById('scarecrowStartImage').style.display = 'flex';
+          document.getElementById('scarecrowQ1Image').style.display = 'none';
+          document.getElementById('scarecrowQ2Image').style.display = 'none';
+          document.getElementById('scarecrowQ3Image').style.display = 'none';
+          document.getElementById('scarecrowQ4Image').style.display = 'none';
+          document.getElementById('scarecrowQ5Image').style.display = 'none';
+          encouragementStep = 3;
+          elements.encouragementButton.style.display = 'none'; // Hide continue button until all questions are answered
+        } else if (gameState.scarecrowQ5Answered) {
+          // Show final sequence and return to game
+          document.getElementById('scarecrowFinalImage').style.display = 'flex';
+          setTimeout(() => {
+            document.getElementById('scarecrowFinalImage').style.display = 'none';
+            document.getElementById('scarecrowCompleteImage').style.display = 'flex';
+            setTimeout(() => {
+              elements.encouragementScreen.style.display = 'none';
+              elements.gameContainer.style.display = 'block';
+              encouragementStep = 1;
+              // Reset states
+              gameState.scarecrowQ1Answered = false;
+              gameState.scarecrowQ2Answered = false;
+              gameState.scarecrowQ3Answered = false;
+              gameState.scarecrowQ4Answered = false;
+              gameState.scarecrowQ5Answered = false;
+              // Reset displays
+              document.getElementById('birdsAndBunniesImage').style.display = 'flex';
+              document.getElementById('scarecrowImage').style.display = 'none';
+              document.getElementById('scarecrowQ1Image').style.display = 'none';
+              document.getElementById('scarecrowQ2Image').style.display = 'none';
+              document.getElementById('scarecrowQ3Image').style.display = 'none';
+              document.getElementById('scarecrowQ4Image').style.display = 'none';
+              document.getElementById('scarecrowQ5Image').style.display = 'none';
+              document.getElementById('scarecrowFinalImage').style.display = 'none';
+              document.getElementById('scarecrowCompleteImage').style.display = 'none';
+            }, 3000);
+          }, 2000);
+          elements.encouragementButton.style.display = 'block';
+          // Clear answers and feedback
+          document.getElementById('scarecrowAnswer1').value = '';
+          document.getElementById('scarecrowAnswer2').value = '';
+          document.getElementById('scarecrowAnswer3').value = '';
+          document.getElementById('scarecrowAnswer4').value = '';
+          document.getElementById('scarecrowFeedback1').textContent = '';
+          document.getElementById('scarecrowFeedback2').textContent = '';
+          document.getElementById('scarecrowFeedback3').textContent = '';
+          document.getElementById('scarecrowFeedback4').textContent = '';
+        }
+      });
+
+      // Add event listener for start question
+      document.getElementById('scarecrowSubmitStart').addEventListener('click', () => {
+        const answer = parseInt(document.getElementById('scarecrowAnswerStart').value);
+        const feedback = document.getElementById('scarecrowFeedbackStart');
+        
+        if (answer === 5) { // 3 + 2 = 5
+          feedback.textContent = "That's correct! Let's continue!";
+          feedback.style.color = "#39742b";
+          elements.correctSound.currentTime = 0;
+          elements.correctSound.play();
+          
+          // Show first question after a short delay
+          setTimeout(() => {
+            document.getElementById('scarecrowStartImage').style.display = 'none';
+            document.getElementById('scarecrowQ1Image').style.display = 'flex';
+          }, 1500);
+        } else {
+          feedback.textContent = "Try again! You can do it!";
+          feedback.style.color = "#c22b31";
+          elements.failSound.currentTime = 0;
+          elements.failSound.play();
+        }
+      });
+
+      // Add event listener for Q1: 4 + 2 = 6
+      document.getElementById('scarecrowSubmit1').addEventListener('click', () => {
+        const answer = parseInt(document.getElementById('scarecrowAnswer1').value);
+        const feedback = document.getElementById('scarecrowFeedback1');
+        
+        if (answer === 7) { // 2 + 5 = 7
+          feedback.textContent = "That's correct! Keep going!";
+          feedback.style.color = "#39742b";
+          elements.correctSound.currentTime = 0;
+          elements.correctSound.play();
+          gameState.scarecrowQ1Answered = true;
+          
+          // Show next question after a short delay
+          setTimeout(() => {
+            document.getElementById('scarecrowQ1Image').style.display = 'none';
+            document.getElementById('scarecrowQ2Image').style.display = 'flex';
+          }, 1500);
+        } else {
+          feedback.textContent = "Try again! You're doing well!";
+          feedback.style.color = "#c22b31";
+          elements.failSound.currentTime = 0;
+          elements.failSound.play();
+        }
+      });
+
+      // Add event listener for Q2: 3 + 4 = 7
+      document.getElementById('scarecrowSubmit2').addEventListener('click', () => {
+        const answer = parseInt(document.getElementById('scarecrowAnswer2').value);
+        const feedback = document.getElementById('scarecrowFeedback2');
+        
+        if (answer === 8) { // 6 + 2 = 8
+          feedback.textContent = "You're doing amazing!";
+          feedback.style.color = "#39742b";
+          elements.correctSound.currentTime = 0;
+          elements.correctSound.play();
+          gameState.scarecrowQ2Answered = true;
+          
+          // Show next question after a short delay
+          setTimeout(() => {
+            document.getElementById('scarecrowQ2Image').style.display = 'none';
+            document.getElementById('scarecrowQ3Image').style.display = 'flex';
+          }, 1500);
+        } else {
+          feedback.textContent = "Almost there! Try again!";
+          feedback.style.color = "#c22b31";
+          elements.failSound.currentTime = 0;
+          elements.failSound.play();
+        }
+      });
+
+      // Add event listener for Q3: 5 + 3 = 8
+      document.getElementById('scarecrowSubmit3').addEventListener('click', () => {
+        const answer = parseInt(document.getElementById('scarecrowAnswer3').value);
+        const feedback = document.getElementById('scarecrowFeedback3');
+        
+        if (answer === 7) { // 4 + 3 = 7
+          feedback.textContent = "Great job! You did it!";
+          feedback.style.color = "#39742b";
+          elements.correctSound.currentTime = 0;
+          elements.correctSound.play();
+          gameState.scarecrowQ3Answered = true;
+          
+          // Show next question after a short delay
+          setTimeout(() => {
+            document.getElementById('scarecrowQ3Image').style.display = 'none';
+            document.getElementById('scarecrowQ4Image').style.display = 'flex';
+          }, 1500);
+        } else {
+          feedback.textContent = "Keep trying! Almost there!";
+          feedback.style.color = "#c22b31";
+          elements.failSound.currentTime = 0;
+          elements.failSound.play();
+        }
+      });
+
+      // Add event listener for Q4: 4 + 5 = 9
+      document.getElementById('scarecrowSubmit4').addEventListener('click', () => {
+        const answer = parseInt(document.getElementById('scarecrowAnswer4').value);
+        const feedback = document.getElementById('scarecrowFeedback4');
+        
+        if (answer === 9) { // 3 + 6 = 9
+          feedback.textContent = "Great job! You did it!";
+          feedback.style.color = "#39742b";
+          elements.correctSound.currentTime = 0;
+          elements.correctSound.play();
+          gameState.scarecrowQ4Answered = true;
+          gameState.scarecrowQ5Answered = true; // Auto-complete Q5 since it's just display
+
+          // Show Q5 briefly, then Complete image
+          setTimeout(() => {
+            document.getElementById('scarecrowQ4Image').style.display = 'none';
+            document.getElementById('scarecrowQ5Image').style.display = 'flex';
+            
+            // Show Complete image after 2 seconds
+            setTimeout(() => {
+              document.getElementById('scarecrowQ5Image').style.display = 'none';
+              document.getElementById('scarecrowCompleteImage').style.display = 'flex';
+              elements.encouragementButton.style.display = 'block';
+              
+              // Return to game after 3 seconds
+              setTimeout(() => {
+                elements.encouragementScreen.style.display = 'none';
+                elements.gameContainer.style.display = 'block';
+                // Restore the level that was active when scarecrow started
+                if (gameState.currentLevel !== gameState.lastActiveLevel) {
+                  gameState.currentLevel = gameState.lastActiveLevel;
+                  startLevel(); // Restart the level where the player had difficulty
+                }
+              }, 3000);
+            }, 2000);
+          }, 1500);
+        } else {
+          feedback.textContent = "Keep trying! Almost there!";
+          feedback.style.color = "#c22b31";
+          elements.failSound.currentTime = 0;
+          elements.failSound.play();
+        }
+      });
+
+      // Q5 is now display-only, no event listener needed
+
+      // Reset submit button event listener to ensure it works
+      const submitBtn = document.getElementById('submitBtn');
+      const newSubmitBtn = submitBtn.cloneNode(true);
+      submitBtn.parentNode.replaceChild(newSubmitBtn, submitBtn);
+      elements.submitBtn = newSubmitBtn;
+      
+      elements.submitBtn.addEventListener('click', () => {
+        const userAnswer = parseInt(elements.answer.value, 10);
+        if (isNaN(userAnswer)) return;
+        
+        if (userAnswer === gameState.currentQuestion.correctAnswer) {
+          gameState.correctAnswers[gameState.currentLevel] += 1;
+          const remaining = gameState.requiredCorrect - gameState.correctAnswers[gameState.currentLevel];
+          elements.feedback.textContent = remaining > 0 ? 
+            `Correct! Need ${remaining} more correct ${remaining === 1 ? 'answer' : 'answers'}!` :
+            "Excellent! You've mastered this level!";
+          elements.feedback.style.color = "#39742b";
+          gameState.score[gameState.currentLevel] += 1;
+          elements.correctSound.currentTime = 0; // Reset sound to start
+          elements.correctSound.play();
+          gameState.consecutiveWrong[gameState.currentLevel] = 0; // Reset consecutive wrong counter for this level
+        } else {
+          elements.feedback.textContent = `Oops! The answer was ${gameState.currentQuestion.correctAnswer}.`;
+          elements.feedback.style.color = "#c22b31";
+          elements.failSound.currentTime = 0;
+          elements.failSound.play();
+          
+          // Track consecutive wrong answers for current level
+          gameState.consecutiveWrong[gameState.currentLevel]++;
+          console.log('Consecutive wrong answers:', gameState.consecutiveWrong[gameState.currentLevel]);
+          
+          // Show encouragement screen after 2 wrong answers in a row
+          if (gameState.consecutiveWrong[gameState.currentLevel] === 2) {
+            elements.gameContainer.style.display = 'none';
+            elements.encouragementScreen.style.display = 'flex';
+            console.log('Showing encouragement screen');
+            elements.encouragementButton.style.display = 'block';
+            // Initialize encouragement sequence
+            document.getElementById('birdsAndBunniesImage').style.display = 'flex';
+            document.getElementById('scarecrowImage').style.display = 'none';
+            document.getElementById('scarecrowQ1Image').style.display = 'none';
+            encouragementStep = 1;
+            gameState.lastActiveLevel = gameState.currentLevel; // Remember current level
+            gameState.consecutiveWrong[gameState.currentLevel] = 0; // Reset counter for this level
+          }
+        }
+        
+        // Increment question counter
+        gameState.questionsAsked[gameState.currentLevel]++;
+        
+        // Temporarily disable input
+        elements.submitBtn.disabled = true;
+        elements.answer.disabled = true;
+        
+        setTimeout(() => {
+          const currentLevel = LEVELS[gameState.currentLevel];
+          // Check if level is complete (enough correct answers or max questions reached)
+          if (gameState.correctAnswers[gameState.currentLevel] >= currentLevel.requiredCorrect || 
+              gameState.questionsAsked[gameState.currentLevel] >= currentLevel.questionCount) {
+            
+            // Show completion message
+            elements.results.textContent = `Congratulations! You've completed this level with ${gameState.correctAnswers[gameState.currentLevel]} correct answers!`;
+            elements.passSound.currentTime = 0;
+            elements.passSound.play();
+            
+            // Show next level button if not on final level
+            if (gameState.currentLevel < LEVELS.length - 1) {
+              elements.nextBtn.style.display = 'inline-block';
+            } else {
+              // On final level - show ending
+              setTimeout(() => {
+                elements.gameContainer.style.display = 'none';
+                elements.endingScreen.style.display = 'flex';
+                elements.feastBgm.currentTime = 0;
+                elements.feastBgm.volume = 0.5;
+                elements.feastBgm.play();
+              }, 2000);
+            }
+          } else {
+            // Continue to next question
+            elements.submitBtn.disabled = false;
+            elements.answer.disabled = false;
+            elements.answer.value = '';
+            elements.feedback.textContent = '';
+            askQuestion();
+          }
+        }, 1500);
+      });
+
+      // Handle level transitions
+      function startNextLevel() {
+        elements.tutorialScreen.style.display = 'none';
+        gameState.questionNum = 0;
+        startLevel();
+      }
+
+      elements.nextBtn.addEventListener('click', () => {
+        elements.nextBtn.style.display = 'none';
+        if (gameState.currentLevel === 0) { // After Level 1, show Theme 2
+          gameState.currentLevel = 1; // Advance to Level 2
+          elements.gameContainer.style.display = 'none';
+          elements.tutorialScreen.style.display = 'flex';
+          document.getElementById('tutorialImage').style.display = 'none';
+          document.getElementById('bgTheme1Image').style.display = 'none';
+          document.getElementById('bgTheme2Image').style.display = 'flex';
+          document.getElementById('bgTheme3Image').style.display = 'none';
+          // Change continue button behavior temporarily
+          const originalStartGameplay = startGameplay;
+          startGameplay = () => {
+            startGameplay = originalStartGameplay; // Restore original function
+            startNextLevel();
+          };
+        } else if (gameState.currentLevel === 1) { // After Level 2, show Theme 3
+          gameState.currentLevel = 2; // Advance to Level 3
+          elements.gameContainer.style.display = 'none';
+          elements.tutorialScreen.style.display = 'flex';
+          document.getElementById('tutorialImage').style.display = 'none';
+          document.getElementById('bgTheme1Image').style.display = 'none';
+          document.getElementById('bgTheme2Image').style.display = 'none';
+          document.getElementById('bgTheme3Image').style.display = 'flex';
+          // Change continue button behavior temporarily
+          const originalStartGameplay = startGameplay;
+          startGameplay = () => {
+            startGameplay = originalStartGameplay; // Restore original function
+            startNextLevel();
+          };
+        } else {
+          gameState.currentLevel += 1;
+          gameState.questionNum = 0;
+          startLevel();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
